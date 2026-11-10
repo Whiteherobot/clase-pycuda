@@ -8,10 +8,10 @@ Ejemplos de clase con PyCUDA y el ejercicio de suma de vectores grandes en la GP
 
 `sumadevectores.py` suma dos vectores de 1 000 000 de elementos (`float32`, creados con NumPy) en la GPU:
 
-1. Reserva la memoria en la GPU (`mem_alloc`) y copia los vectores de entrada (`memcpy_htod`).
+1. Pasa los vectores al kernel con `drv.In(a)` y `drv.In(b)`, y el resultado con `drv.Out(dest)`. PyCUDA reserva la memoria en la GPU, copia las entradas antes de lanzar el kernel, trae `dest` de vuelta al terminar y libera la memoria.
 2. Compila el kernel `add` con `SourceModule`. Cada hilo calcula su índice global `threadIdx.x + blockIdx.x * blockDim.x` y solo escribe si `tid < n`, para no salirse del vector.
 3. Lo lanza con 128, 256 y 512 hilos por bloque. Los bloques se calculan como `(N + hilos - 1) // hilos`.
-4. Trae el resultado (`memcpy_dtoh`) y lo compara con `a + b` de NumPy usando `numpy.allclose`.
+4. Compara el resultado con `a + b` de NumPy usando `numpy.allclose`.
 
 Resultado en una RTX 4060:
 
